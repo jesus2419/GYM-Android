@@ -6,6 +6,7 @@ import androidx.compose.ui.unit.dp
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Info
@@ -13,17 +14,16 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-
-sealed class BottomNavItem(val title: String, val icon: androidx.compose.ui.graphics.vector.ImageVector) {
-    object Home : BottomNavItem("Inicio", Icons.Filled.Home)
-    object Favorites : BottomNavItem("Favoritos", Icons.Filled.Star)
-    object Trainers : BottomNavItem("Entrenadores", Icons.Filled.Person)
-    object Info : BottomNavItem("Información", Icons.Filled.Info)
-}
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 
 @Composable
 fun MainScreen() {
+    val navController = rememberNavController()
     var selectedItem by remember { mutableStateOf(0) }
+
     val screens = listOf(
         BottomNavItem.Home,
         BottomNavItem.Favorites,
@@ -39,27 +39,82 @@ fun MainScreen() {
                         icon = { Icon(screen.icon, contentDescription = screen.title) },
                         label = { Text(screen.title) },
                         selected = selectedItem == index,
-                        onClick = { selectedItem = index }
+                        onClick = {
+                            selectedItem = index
+                            // Navegación a las pantallas principales
+                            navController.popBackStack()
+                            navController.navigate(screen.route)
+                        }
                     )
                 }
             }
         }
     ) { innerPadding ->
-        when (selectedItem) {
-            0 -> HomeScreen()
-            1 -> PlaceholderScreen("Favoritos")
-            2 -> PlaceholderScreen("Entrenadores")
-            3 -> PlaceholderScreen("Información")
+        NavHost(
+            navController = navController,
+            startDestination = BottomNavItem.Home.route,
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            // Pantalla de Inicio
+            composable(BottomNavItem.Home.route) {
+                HomeScreen()
+            }
+
+            // Pantalla de Favoritos
+            composable(BottomNavItem.Favorites.route) {
+                PlaceholderScreen("Favoritos")
+            }
+
+            // Pantalla de Entrenadores con su propia navegación interna
+            composable(BottomNavItem.Trainers.route) {
+                TrainersNavHost() // Nuevo NavHost anidado para entrenadores
+            }
+
+            // Pantalla de Información
+            composable(BottomNavItem.Info.route) {
+                PlaceholderScreen("Información")
+            }
         }
     }
 }
 
 @Composable
-fun PlaceholderScreen(title: String) {
-    Box(
-        modifier = Modifier
-            .padding(16.dp)
+fun PlaceholderScreen(x0: String) {
+    TODO("Not yet implemented")
+}
+
+// Nuevo NavHost específico para la sección de entrenadores
+@Composable
+fun TrainersNavHost() {
+    val navController = rememberNavController()
+
+    NavHost(
+        navController = navController,
+        startDestination = "trainersList"
     ) {
-        Text(text = title)
+        composable("trainersList") {
+            TrainersScreen(
+                onTrainerClick = { trainerId ->
+                    navController.navigate("trainerDetails/$trainerId")
+                }
+            )
+        }
+
+        composable("trainerDetails/{trainerId}") { backStackEntry ->
+            val trainerId = backStackEntry.arguments?.getString("trainerId")?.toIntOrNull() ?: 0
+            TrainerDetailScreen(trainerId = trainerId)
+        }
     }
+}
+
+// Actualiza tu data class BottomNavItem para incluir rutas
+sealed class BottomNavItem(
+    val title: String,
+    val icon: ImageVector,
+    val route: String
+) {
+    object Home : BottomNavItem("Inicio", Icons.Default.Home, "home")
+    object Favorites : BottomNavItem("Favoritos", Icons.Default.Favorite, "favorites")
+    object Trainers : BottomNavItem("Entrenadores", Icons.Default.Person, "trainers")
+    object Info : BottomNavItem("Info", Icons.Default.Info, "info")
 }
