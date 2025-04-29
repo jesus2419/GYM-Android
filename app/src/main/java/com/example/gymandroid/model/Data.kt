@@ -8,7 +8,7 @@ data class Trainer(
     val lastName: String,
     val profileImageUrl: String,
     val schedule: String,
-    val coverImageUrl: String = "https://via.placeholder.com/800x300",
+    val coverImageUrl: String = "https://static.filehorse.com/screenshots/developer-tools/oracle-sql-developer-screenshot-02.png",
     val description: String = "Entrenador profesional con 10 años de experiencia",
     val socialLinks: List<SocialLink> = listOf(
         SocialLink("Instagram", "https://instagram.com"),

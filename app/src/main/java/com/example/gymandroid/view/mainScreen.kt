@@ -80,7 +80,7 @@ fun MainScreen() {
 
 @Composable
 fun PlaceholderScreen(x0: String) {
-    TODO("Not yet implemented")
+
 }
 
 // Nuevo NavHost específico para la sección de entrenadores

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -60,12 +61,10 @@ import com.example.gymandroid.model.Trainer
 import com.example.gymandroid.model.dummyCategories
 import com.example.gymandroid.model.dummyTrainers
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TrainerDetailScreen(trainerId: Int) {
     val trainer = dummyTrainers.first { it.id == trainerId }
-
     val tabTitles = listOf("Perfil", "Rutinas")
     var selectedTabIndex by remember { mutableStateOf(0) }
 
@@ -82,30 +81,31 @@ fun TrainerDetailScreen(trainerId: Int) {
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
-            // Cover image
-            AsyncImage(
-                model = trainer.coverImageUrl,
-                contentDescription = "Portada de ${trainer.name}",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp),
-                contentScale = ContentScale.Crop
-            )
-
-            // Profile image overlapping the cover
+            // Contenedor para las imágenes (portada + perfil superpuesto)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 150.dp),
-                contentAlignment = Alignment.Center
+                    .height(200.dp) // Altura total del contenedor
             ) {
+                // Imagen de portada
+                AsyncImage(
+                    model = trainer.coverImageUrl,
+                    contentDescription = "Portada de ${trainer.name}",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp),
+                    contentScale = ContentScale.Crop
+                )
+
+                // Imagen de perfil superpuesta
                 AsyncImage(
                     model = trainer.profileImageUrl,
                     contentDescription = "Foto de ${trainer.name}",
                     modifier = Modifier
                         .size(100.dp)
                         .clip(CircleShape)
-                        .border(2.dp, Color.White, CircleShape),
+                        .border(2.dp, Color.White, CircleShape)
+                        .align(Alignment.TopCenter), // Alineamos arriba del Box contenedor
                     contentScale = ContentScale.Crop
                 )
             }
@@ -121,10 +121,16 @@ fun TrainerDetailScreen(trainerId: Int) {
                 }
             }
 
-            // Tab content
+            // Contenido de las tabs
             when (selectedTabIndex) {
                 0 -> ProfileTabContent(trainer)
-                1 -> RoutinesTabContent()
+                1 -> Box(modifier = Modifier.weight(1f)) {
+                    LazyColumn {
+                        items(dummyCategories) { category ->
+                            CategoryItem(category)
+                        }
+                    }
+                }
             }
         }
     }
@@ -200,10 +206,12 @@ fun SocialLinkItem(link: SocialLink) {
 
 @Composable
 fun RoutinesTabContent() {
-    LazyColumn(
-        modifier = Modifier.padding(16.dp)
+    Column(
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth()
     ) {
-        items(dummyCategories) { category ->
+        dummyCategories.forEach { category ->
             CategoryItem(category)
         }
     }
