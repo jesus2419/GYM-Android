@@ -44,7 +44,7 @@ val dummyCategories = listOf(
                 title = "Press de Banca $i",
                 muscle = "Pectoral",
                 repsOrTime = "4x12",
-                imageUrl = "https://via.placeholder.com/300x200"
+                imageUrl = "https://www.projectcubicle.com/wp-content/uploads/2024/03/SQL-Developers.png"
             )
         }
     ),

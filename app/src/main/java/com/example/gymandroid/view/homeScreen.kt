@@ -29,7 +29,53 @@ import coil.compose.rememberAsyncImagePainter
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.gymandroid.viewmodel.HomeViewModel
 
+
+@Composable
+fun HomeScreen(
+    viewModel: HomeViewModel = viewModel()
+) {
+    val categories by viewModel.categories.collectAsState()
+    val favorites by viewModel.favoriteExercises.collectAsState()
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(AppTheme.BackgroundColor)
+            .padding(8.dp)
+    ) {
+        items(categories.size) { categoryIndex ->
+            val category = categories[categoryIndex]
+
+            Text(
+                text = category.name,
+                modifier = Modifier.padding(vertical = 8.dp),
+                color = Color.White,
+                fontWeight = FontWeight.Bold
+            )
+
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(bottom = 16.dp)
+            ) {
+                items(category.exercises.size) { exerciseIndex ->
+                    val exercise = category.exercises[exerciseIndex]
+                    ExerciseCard(
+                        exercise = exercise,
+                        isFavorite = favorites.contains(exercise.id),
+                        onFavoriteClick = { viewModel.toggleFavorite(it) }
+                    )
+                }
+            }
+        }
+    }
+}
+
+
+
+/*
 @Composable
 fun HomeScreen() {
     LazyColumn(
@@ -118,3 +164,6 @@ fun ExerciseCard(exercise: Exercise) {
         }
     }
 }
+
+
+ */

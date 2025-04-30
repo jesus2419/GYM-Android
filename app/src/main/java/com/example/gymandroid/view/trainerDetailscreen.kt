@@ -105,7 +105,7 @@ fun TrainerDetailScreen(trainerId: Int) {
                         .size(100.dp)
                         .clip(CircleShape)
                         .border(2.dp, Color.White, CircleShape)
-                        .align(Alignment.TopCenter), // Alineamos arriba del Box contenedor
+                        .align(Alignment.BottomCenter), // Alineamos arriba del Box contenedor
                     contentScale = ContentScale.Crop
                 )
             }

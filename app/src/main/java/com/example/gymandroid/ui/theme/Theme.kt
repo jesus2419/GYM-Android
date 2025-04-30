@@ -67,7 +67,7 @@ object AppTheme {
     val SecondaryColor = Color(0xFF42A5F5)
     val BackgroundColor = Color(0xFFF5F5F5)
     val TextColor = Color(0xFF212121)
-    val LikeColor = Color(0xFFFF5252)
+    val LikeColor = Color(0xFF111111)
 
     // Logo o íconos podrías tener como URLs o resources luego
     const val AppLogoUrl = "https://via.placeholder.com/150"
