@@ -39,6 +39,8 @@ fun HomeScreen(
 ) {
     val categories by viewModel.categories.collectAsState()
     val favorites by viewModel.favoriteExercises.collectAsState()
+    val likedExercise by viewModel.likedExercise.collectAsState()
+
 
 
 
@@ -67,7 +69,8 @@ fun HomeScreen(
                     ExerciseCard(
                         exercise = exercise,
                         isFavorite = favorites.contains(exercise.id),
-                        onFavoriteClick = { viewModel.toggleFavorite(it) }
+                        onFavoriteClick = { viewModel.toggleFavorite(it) },
+                        isLiked = likedExercise?.id == exercise.id
                     )
                 }
             }
@@ -77,95 +80,3 @@ fun HomeScreen(
 
 
 
-/*
-@Composable
-fun HomeScreen() {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(AppTheme.BackgroundColor)
-            .padding(8.dp)
-    ) {
-        items(dummyCategories.size) { categoryIndex ->
-            val category = dummyCategories[categoryIndex]
-
-            Text(
-                text = category.name,
-                style = MaterialTheme.typography.titleLarge.copy(
-                    color = AppTheme.TextColor,
-                    fontWeight = FontWeight.Bold
-                ),
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
-
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.padding(bottom = 16.dp)
-            ) {
-                items(category.exercises.size) { exerciseIndex ->
-                    ExerciseCard(category.exercises[exerciseIndex])
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun ExerciseCard(exercise: Exercise) {
-    var liked by remember { mutableStateOf(false) }
-
-    Column(
-        modifier = Modifier
-            .width(200.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .background(Color.White)
-            .padding(8.dp)
-    ) {
-        Image(
-            painter = rememberAsyncImagePainter(exercise.imageUrl),
-            contentDescription = exercise.title,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .height(120.dp)
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = exercise.title,
-            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-            color = AppTheme.TextColor
-        )
-
-        Text(
-            text = exercise.muscle,
-            style = MaterialTheme.typography.bodySmall,
-            color = AppTheme.TextColor
-        )
-
-        Text(
-            text = exercise.repsOrTime,
-            style = MaterialTheme.typography.bodySmall,
-            color = AppTheme.TextColor
-        )
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Spacer(modifier = Modifier.weight(1f))
-            IconButton(onClick = { liked = !liked }) {
-                Icon(
-                    imageVector = if (liked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                    contentDescription = "Like",
-                    tint = if (liked) AppTheme.LikeColor else AppTheme.TextColor
-                )
-            }
-        }
-    }
-}
-
-
- */

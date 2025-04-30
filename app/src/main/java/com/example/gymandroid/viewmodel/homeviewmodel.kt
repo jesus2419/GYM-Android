@@ -11,6 +11,7 @@ import com.example.gymandroid.model.Exercise
 import com.example.gymandroid.model.ExerciseDBHandler
 import com.example.gymandroid.model.ExerciseRepository
 import com.example.gymandroid.model.dummyCategories
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -41,24 +42,36 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
 
-    fun toggleFavorite(exercise: Exercise) {
-        val wasFavorite = _favoriteExercises.value.contains(exercise.id)
+    // Función para cargar favoritos al iniciar
+    init {
+        loadInitialFavorites()
+    }
 
-        // Actualizamos el estado de favoritos
-        _favoriteExercises.value = if (wasFavorite) {
-            _favoriteExercises.value - exercise.id
+    private fun loadInitialFavorites() {
+        viewModelScope.launch {
+            val favoriteIds = dbHandler.getAllFavorites().map { it.id }
+            _favoriteExercises.value = favoriteIds.toSet()
+        }
+    }
+
+    // Modifica tu toggleFavorite para usar la base de datos
+    fun toggleFavorite(exercise: Exercise) {
+        val isCurrentlyFavorite = _favoriteExercises.value.contains(exercise.id)
+
+        if (isCurrentlyFavorite) {
+            // Eliminar de favoritos
+            dbHandler.removeFavorite(exercise.id)
+            _favoriteExercises.value = _favoriteExercises.value - exercise.id
         } else {
-            // Solo registramos cuando se AGREGA a favoritos
-            logExerciseLike(exercise)
-            _favoriteExercises.value + exercise.id
+            // Agregar a favoritos
+            dbHandler.addFavorite(exercise)
+            _favoriteExercises.value = _favoriteExercises.value + exercise.id
         }
 
-        // Establecemos el ejercicio al que se dio like para la animación
+        // Animación
         _likedExercise.value = exercise
-
-        // Resetear después de un tiempo para la animación
         viewModelScope.launch {
-            kotlinx.coroutines.delay(1000) // Duración de la animación
+            delay(1000)
             _likedExercise.value = null
         }
     }

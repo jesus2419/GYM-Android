@@ -34,7 +34,8 @@ import com.example.gymandroid.viewmodel.HomeViewModel
 fun ExerciseCard(
     exercise: Exercise,
     isFavorite: Boolean,
-    onFavoriteClick: (Exercise) -> Unit, // Ahora recibe el Exercise completo
+    onFavoriteClick: (Exercise) -> Unit,
+    isLiked: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     // Observamos el estado de la animación
@@ -98,7 +99,7 @@ fun ExerciseCard(
                 Icon(
                     imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                     contentDescription = "Favorito",
-                    tint = if (isFavorite) AppTheme.LikeColor else AppTheme.TextColor
+                    tint = if (isFavorite || isLiked) AppTheme.LikeColor else AppTheme.TextColor
                 )
             }
         }
