@@ -30,16 +30,24 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.example.gymandroid.model.ExerciseDBHandler
 import com.example.gymandroid.viewmodel.HomeViewModel
 
 
 @Composable
 fun HomeScreen(
+    navController: NavController,
     viewModel: HomeViewModel = viewModel()
 ) {
     val categories by viewModel.categories.collectAsState()
     val favorites by viewModel.favoriteExercises.collectAsState()
     val likedExercise by viewModel.likedExercise.collectAsState()
+
+
+
+
+
 
 
 
@@ -70,7 +78,9 @@ fun HomeScreen(
                         exercise = exercise,
                         isFavorite = favorites.contains(exercise.id),
                         onFavoriteClick = { viewModel.toggleFavorite(it) },
-                        isLiked = likedExercise?.id == exercise.id
+                        isLiked = likedExercise?.id == exercise.id,
+                        navController = navController,  // Pasa el navController aquí
+
                     )
                 }
             }

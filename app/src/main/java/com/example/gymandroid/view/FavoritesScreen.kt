@@ -25,6 +25,7 @@ import com.example.gymandroid.viewmodel.FavoritesViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoritesScreen(
+    navController: NavController,
 
     viewModel: FavoritesViewModel = viewModel(factory = FavoritesViewModel.Factory)
 ) {
@@ -47,6 +48,7 @@ fun FavoritesScreen(
                     EmptyFavoritesView()
                 } else {
                     FavoritesList(
+                        navController = navController,  // Pasa el navController aquí
                         exercises = favorites,
                         onRemoveFavorite = { viewModel.removeFavorite(it) }
                     )
@@ -58,6 +60,7 @@ fun FavoritesScreen(
 
 @Composable
 private fun FavoritesList(
+    navController: NavController,
     exercises: List<Exercise>,
     onRemoveFavorite: (Exercise) -> Unit
 ) {
@@ -71,6 +74,7 @@ private fun FavoritesList(
             ExerciseCard(
                 exercise = exercise,
                 isFavorite = true, // Siempre true porque estamos en favoritos
+                navController = navController,  // Pasa el navController aquí
                 onFavoriteClick = { onRemoveFavorite(exercise) },
                 modifier = Modifier.fillMaxWidth()
             )

@@ -1,5 +1,7 @@
 package com.example.gymandroid.model
 
+import java.time.LocalDate
+
 
 // Modelos de datos
 data class Trainer(
@@ -17,6 +19,20 @@ data class Trainer(
     )
 )
 
+
+data class payday(
+    val id: Int,
+    val date: LocalDate,          // Fecha de pago
+    val isSelected: Boolean = false // Para resaltar la fecha seleccionada
+
+)
+
+val dummypayday = listOf(
+    payday(
+        id = 1,
+        date = LocalDate.now()
+    ))
+
 data class SocialLink(
     val platform: String,
     val url: String
@@ -27,13 +43,99 @@ data class Exercise(
     val title: String,
     val muscle: String,
     val repsOrTime: String,
-    val imageUrl: String
+    val imageUrl: String = "",
+    val description: String = "Descripción detallada del ejercicio..."
 )
-
 data class Category(
     val name: String,
     val exercises: List<Exercise>
 )
+
+/*
+val dummyCategories = listOf(
+    Category(
+        name = "Pecho",
+        exercises = listOf(
+            Exercise(
+                id = 1,
+                title = "Press de Banca 1",
+                muscle = "Pectoral",
+                repsOrTime = "4x12",
+                imageUrl = "https://www.projectcubicle.com/wp-content/uploads/2024/03/SQL-Developers.png"
+            ),
+            Exercise(
+                id = 2,
+                title = "Press de Banca 2",
+                muscle = "Pectoral",
+                repsOrTime = "4x12",
+                imageUrl = "https://www.projectcubicle.com/wp-content/uploads/2024/03/SQL-Developers.png"
+            ),
+            Exercise(
+                id = 3,
+                title = "Press de Banca 3",
+                muscle = "Pectoral",
+                repsOrTime = "4x12",
+                imageUrl = "https://www.projectcubicle.com/wp-content/uploads/2024/03/SQL-Developers.png"
+            )
+        )
+
+    ),
+    Category(
+        name = "Piernas",
+        exercises = listOf(
+            Exercise(
+                id = 4,
+                title = "Sentadilla 4",
+                muscle = "Cuádriceps",
+                repsOrTime = "3x15"
+
+            ),
+            Exercise(
+                id = 5,
+                title = "Sentadilla 5",
+                muscle = "Cuádriceps",
+                repsOrTime = "3x15"
+
+            ),
+            Exercise(
+                id = 6,
+                title = "Sentadilla 6",
+                muscle = "Cuádriceps",
+                repsOrTime = "3x15"
+
+            )
+
+        )
+    ),
+    Category(
+        name = "Espalda",
+        exercises = listOf(
+            Exercise(
+                id = 7,
+                title = "Peso Muerto 7",
+                muscle = "Espalda baja",
+                repsOrTime = "3x10"
+            ),
+            Exercise(
+                id = 8,
+                title = "Peso Muerto 8",
+                muscle = "Espalda baja",
+                repsOrTime = "3x10"
+            ),
+            Exercise(
+                id = 9,
+                title = "Peso Muerto 9",
+                muscle = "Espalda baja",
+                repsOrTime = "3x10"
+            )
+        )
+    )
+)
+
+
+ */
+
+
 
 val dummyCategories = listOf(
     Category(
@@ -55,8 +157,8 @@ val dummyCategories = listOf(
                 id = i,
                 title = "Sentadilla $i",
                 muscle = "Cuádriceps",
-                repsOrTime = "3x15",
-                imageUrl = "https://via.placeholder.com/300x200"
+                repsOrTime = "3x15"
+
             )
         }
     ),
@@ -67,12 +169,14 @@ val dummyCategories = listOf(
                 id = i,
                 title = "Peso Muerto $i",
                 muscle = "Espalda baja",
-                repsOrTime = "3x10",
-                imageUrl = "https://via.placeholder.com/300x200"
+                repsOrTime = "3x10"
             )
         }
     )
 )
+
+
+
 
 
 // Datos de ejemplo
@@ -99,3 +203,6 @@ val dummyTrainers = listOf(
         schedule = "Lunes a Jueves: 10:00 - 20:00"
     )
 )
+
+
+

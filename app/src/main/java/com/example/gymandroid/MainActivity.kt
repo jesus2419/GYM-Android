@@ -15,10 +15,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.gymandroid.model.ExerciseDBHandler
 import com.example.gymandroid.ui.theme.GymAndroidTheme
 import com.example.gymandroid.view.MainScreen
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -29,6 +31,8 @@ class MainActivity : ComponentActivity() {
                     .fillMaxSize()
                     .windowInsetsPadding(WindowInsets.systemBars)
             ) {
+
+
                 MainScreen()
             }
         }

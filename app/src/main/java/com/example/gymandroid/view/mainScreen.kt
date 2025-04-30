@@ -13,13 +13,17 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.gymandroid.ui.theme.AppTheme
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,12 +77,12 @@ fun MainScreen() {
         ) {
             // Pantalla de Inicio
             composable(BottomNavItem.Home.route) {
-                HomeScreen()
+                HomeScreen(navController)
             }
 
             // Pantalla de Favoritos
             composable(BottomNavItem.Favorites.route) {
-                FavoritesScreen()
+                FavoritesScreen(navController)
             }
 
             // Pantalla de Entrenadores con su propia navegación interna
@@ -88,8 +92,27 @@ fun MainScreen() {
 
             // Pantalla de Información
             composable(BottomNavItem.Info.route) {
-                PlaceholderScreen("Información")
+                var selectedDate by remember { mutableStateOf(LocalDate.now()) }
+
+                CalendarView(
+                    selectedDate = selectedDate,
+                    onDateSelected = { newDate -> selectedDate = newDate })
             }
+
+
+            composable(
+                route = "exercise_detail/{exerciseId}",
+                arguments = listOf(navArgument("exerciseId") {
+                    type = NavType.IntType
+                })
+            ) { backStackEntry ->
+                val exerciseId = backStackEntry.arguments?.getInt("exerciseId") ?: -1
+                ExerciseDetailScreen(
+                    exerciseId = exerciseId,
+                    navController = navController
+                )
+            }
+
         }
     }
 }

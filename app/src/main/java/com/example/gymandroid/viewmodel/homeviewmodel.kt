@@ -3,6 +3,7 @@ package com.example.gymandroid.viewmodel
 
 import android.app.Application
 import android.util.Log
+import androidx.compose.material3.Text
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -38,6 +39,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private fun loadCategories() {
         viewModelScope.launch {
             _categories.value = ExerciseRepository.getCategories()
+            //_categories.value = ExerciseRepository.getCategories2()
         }
     }
 
@@ -105,4 +107,13 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             Log.w("FAVORITE", "No se pudo eliminar el ejercicio ${exercise.title}")
         }
     }
+
+    // Función para eliminar favorito con verificación
+    fun eliminar() {
+        if (dbHandler.deleteAllData()){
+
+        }
+    }
+
+
 }

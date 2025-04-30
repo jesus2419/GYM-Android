@@ -200,6 +200,27 @@ class ExerciseDBHandler(context: Context) : SQLiteOpenHelper(context, DATABASE_N
         }
         return favorites
     }
+
+    // Dentro de tu DatabaseHelper (ExerciseDBHandler)
+    fun deleteAllData() : Boolean {
+        val db = writableDatabase
+        try {
+            // Elimina todos los registros de todas las tablas
+            db.execSQL("DELETE FROM $TABLE_FAVORITES")
+            // Si tienes más tablas, añade líneas similares:
+            // db.execSQL("DELETE FROM otra_tabla")
+
+
+        } catch (e: Exception) {
+            Log.e("DB_ERROR", "Error delete favorites", e)
+            return false
+        }
+        finally {
+            db.close()
+        }
+        return true
+    }
+
     companion object {
         @Volatile
         private var INSTANCE: ExerciseDBHandler? = null

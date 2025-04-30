@@ -25,16 +25,21 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.gymandroid.model.Exercise
 import com.example.gymandroid.ui.theme.AppTheme
 import com.example.gymandroid.viewmodel.HomeViewModel
+
+
 @Composable
 fun ExerciseCard(
     exercise: Exercise,
     isFavorite: Boolean,
     onFavoriteClick: (Exercise) -> Unit,
+    navController: NavController,  // Añade navController como parámetro
     isLiked: Boolean = false,
     modifier: Modifier = Modifier
 ) {
@@ -57,6 +62,10 @@ fun ExerciseCard(
             .clip(RoundedCornerShape(16.dp))
             .background(Color.White)
             .padding(8.dp)
+            .clickable {
+                // Navega a la pantalla de detalles con el ID del ejercicio
+                navController.navigate("exercise_detail/${exercise.id}")
+            }
     ) {
         Image(
             painter = rememberAsyncImagePainter(exercise.imageUrl),
