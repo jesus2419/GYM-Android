@@ -40,6 +40,8 @@ fun HomeScreen(
     val categories by viewModel.categories.collectAsState()
     val favorites by viewModel.favoriteExercises.collectAsState()
 
+
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()

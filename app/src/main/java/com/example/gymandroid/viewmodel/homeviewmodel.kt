@@ -1,10 +1,14 @@
 package com.example.gymandroid.viewmodel
 
 
+import android.app.Application
+import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gymandroid.model.Category
 import com.example.gymandroid.model.Exercise
+import com.example.gymandroid.model.ExerciseDBHandler
 import com.example.gymandroid.model.ExerciseRepository
 import com.example.gymandroid.model.dummyCategories
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +17,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 
-class HomeViewModel : ViewModel() {
+class HomeViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val dbHandler = ExerciseDBHandler(application)
+
     private val _categories = MutableStateFlow<List<Category>>(emptyList())
     val categories: StateFlow<List<Category>> = _categories.asStateFlow()
 
@@ -55,10 +62,34 @@ class HomeViewModel : ViewModel() {
             _likedExercise.value = null
         }
     }
-
     private fun logExerciseLike(exercise: Exercise) {
-        // Lógica adicional con el ejercicio completo
-        println("Ejercicio likeado: ${exercise.title} (ID: ${exercise.id})")
-        // Puedes enviar a analytics, base de datos, etc.
+        when (val result = dbHandler.addFavorite(exercise)) {
+            is ExerciseDBHandler.SaveResult.Success -> {
+                // Guardado exitoso (nuevo registro)
+                Log.d("FAVORITE", "Nuevo favorito guardado: ${exercise.title}")
+
+            }
+            is ExerciseDBHandler.SaveResult.Updated -> {
+                // Actualización exitosa (ya existía)
+                Log.d("FAVORITE", "Favorito actualizado: ${exercise.title}")
+
+            }
+            is ExerciseDBHandler.SaveResult.Error -> {
+                // Error al guardar
+                Log.e("FAVORITE", "Error al guardar favorito", result.exception)
+
+            }
+        }
+    }
+
+
+    // Función para eliminar favorito con verificación
+    fun removeFavorite(exercise: Exercise) {
+        if (dbHandler.removeFavorite(exercise.id)) {
+            Log.d("FAVORITE", "Ejercicio ${exercise.title} eliminado de favoritos")
+
+        } else {
+            Log.w("FAVORITE", "No se pudo eliminar el ejercicio ${exercise.title}")
+        }
     }
 }

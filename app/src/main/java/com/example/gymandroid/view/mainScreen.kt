@@ -14,11 +14,14 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.gymandroid.ui.theme.AppTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
@@ -32,6 +35,19 @@ fun MainScreen() {
     )
 
     Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(text = "si") },
+
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = AppTheme.PrimaryColor,
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White
+                )
+            )
+        },
+        containerColor = AppTheme.BackgroundColor,
+
         bottomBar = {
             NavigationBar {
                 screens.forEachIndexed { index, screen ->
@@ -62,7 +78,7 @@ fun MainScreen() {
 
             // Pantalla de Favoritos
             composable(BottomNavItem.Favorites.route) {
-                PlaceholderScreen("Favoritos")
+                FavoritesScreen()
             }
 
             // Pantalla de Entrenadores con su propia navegación interna
