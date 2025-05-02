@@ -61,7 +61,7 @@ fun MainScreen() {
 
         Scaffold(
             topBar = {
-                TopAppBar(
+                CenterAlignedTopAppBar(
                     title = { Text(text = "si") },
                     navigationIcon = {
                         IconButton(
@@ -113,13 +113,6 @@ fun MainScreen() {
                     FavoritesScreen(navController)
                 }
 
-                // Pantalla de Entrenadores con su propia navegación interna
-                /*
-                composable(BottomNavItem.Trainers.route) {
-                    TrainersNavHost(navController) // Nuevo NavHost anidado para entrenadores
-                }
-
-                */
 
                 composable(BottomNavItem.Trainers.route) {
                     TrainersScreen(
@@ -162,34 +155,8 @@ fun MainScreen() {
     }
 }
 
-@Composable
-fun PlaceholderScreen(x0: String) {
 
-}
 
-// Nuevo NavHost específico para la sección de entrenadores
-@Composable
-fun TrainersNavHost(navController1: NavController) {
-    val navController = rememberNavController()
-
-    NavHost(
-        navController = navController,
-        startDestination = "trainersList"
-    ) {
-        composable("trainersList") {
-            TrainersScreen(
-                onTrainerClick = { trainerId ->
-                    navController.navigate("trainerDetails/$trainerId")
-                }
-            )
-        }
-
-        composable("trainerDetails/{trainerId}") { backStackEntry ->
-            val trainerId = backStackEntry.arguments?.getString("trainerId")?.toIntOrNull() ?: 0
-            TrainerDetailScreen(trainerId = trainerId, navController1)
-        }
-    }
-}
 
 // Actualiza tu data class BottomNavItem para incluir rutas
 sealed class BottomNavItem(

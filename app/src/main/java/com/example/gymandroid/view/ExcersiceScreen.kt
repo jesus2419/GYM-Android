@@ -33,6 +33,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -92,22 +93,18 @@ fun ExerciseDetailScreen(
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
+            TopAppBar(
                 title = { Text(exercise.title) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Volver",
-                            tint = Color.White
+                            tint = Color.Gray
                         )
                     }
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = AppTheme.PrimaryColor,
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White
-                )
+                }
+
             )
         },
         floatingActionButton = {
@@ -130,20 +127,7 @@ fun ExerciseDetailScreen(
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
         ) {
-            // Imagen de portada
-            /*
-            if (exercise.imageUrl == "") {
-                Image(
-                    painter = rememberAsyncImagePainter(exercise.imageUrl),
-                    contentDescription = exercise.title,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(250.dp)
-                )
-            }
 
-             */
             Image(
                 painter = rememberAsyncImagePainter(exercise.imageUrl),
                 contentDescription = exercise.title,
