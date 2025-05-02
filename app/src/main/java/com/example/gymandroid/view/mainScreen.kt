@@ -6,10 +6,12 @@ import androidx.compose.ui.unit.dp
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Factory
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -17,12 +19,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.gymandroid.ui.theme.AppTheme
+import com.example.gymandroid.viewmodel.mainViewModel
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,6 +35,10 @@ import java.time.LocalDate
 fun MainScreen() {
     val navController = rememberNavController()
     var selectedItem by remember { mutableStateOf(0) }
+    val viewModel: mainViewModel = viewModel(factory = mainViewModel.Factory)
+    val scope = rememberCoroutineScope()
+
+
 
     val screens = listOf(
         BottomNavItem.Home,
@@ -38,81 +47,100 @@ fun MainScreen() {
         BottomNavItem.Info
     )
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(text = "si") },
-
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = AppTheme.PrimaryColor,
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White
-                )
+    ModalNavigationDrawer(
+        drawerState = viewModel.drawerState,
+        drawerContent = {
+            DrawerContent(
+                onClose = {
+                    scope.launch { viewModel.drawerState.close() }
+                }
             )
-        },
-        containerColor = AppTheme.BackgroundColor,
+        }
+    ) {
 
-        bottomBar = {
-            NavigationBar {
-                screens.forEachIndexed { index, screen ->
-                    NavigationBarItem(
-                        icon = { Icon(screen.icon, contentDescription = screen.title) },
-                        label = { Text(screen.title) },
-                        selected = selectedItem == index,
-                        onClick = {
-                            selectedItem = index
-                            // Navegación a las pantallas principales
-                            navController.popBackStack()
-                            navController.navigate(screen.route)
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text(text = "si") },
+                    navigationIcon = {
+                        IconButton(
+                            onClick = { scope.launch { viewModel.drawerState.open() } }
+                        ) {
+                            Icon(Icons.Default.Menu, contentDescription = "Abrir menú")
                         }
+                    },
+
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = AppTheme.PrimaryColor,
+                        titleContentColor = Color.White,
+                        navigationIconContentColor = Color.White
                     )
+                )
+            },
+            containerColor = AppTheme.BackgroundColor,
+
+            bottomBar = {
+                NavigationBar {
+                    screens.forEachIndexed { index, screen ->
+                        NavigationBarItem(
+                            icon = { Icon(screen.icon, contentDescription = screen.title) },
+                            label = { Text(screen.title) },
+                            selected = selectedItem == index,
+                            onClick = {
+                                selectedItem = index
+                                // Navegación a las pantallas principales
+                                navController.popBackStack()
+                                navController.navigate(screen.route)
+                            }
+                        )
+                    }
                 }
             }
-        }
-    ) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = BottomNavItem.Home.route,
-            modifier = Modifier.padding(innerPadding)
-        ) {
-            // Pantalla de Inicio
-            composable(BottomNavItem.Home.route) {
-                HomeScreen(navController)
+        ) { innerPadding ->
+            NavHost(
+                navController = navController,
+                startDestination = BottomNavItem.Home.route,
+                modifier = Modifier.padding(innerPadding)
+            ) {
+                // Pantalla de Inicio
+                composable(BottomNavItem.Home.route) {
+                    HomeScreen(navController)
+                }
+
+                // Pantalla de Favoritos
+                composable(BottomNavItem.Favorites.route) {
+                    FavoritesScreen(navController)
+                }
+
+                // Pantalla de Entrenadores con su propia navegación interna
+                composable(BottomNavItem.Trainers.route) {
+                    TrainersNavHost() // Nuevo NavHost anidado para entrenadores
+                }
+
+                // Pantalla de Información
+                composable(BottomNavItem.Info.route) {
+                    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
+
+                    CalendarView(
+                        selectedDate = selectedDate,
+                        onDateSelected = { newDate -> selectedDate = newDate })
+                }
+
+
+                composable(
+                    route = "exercise_detail/{exerciseId}",
+                    arguments = listOf(navArgument("exerciseId") {
+                        type = NavType.IntType
+                    })
+                ) { backStackEntry ->
+                    val exerciseId = backStackEntry.arguments?.getInt("exerciseId") ?: -1
+                    ExerciseDetailScreen(
+                        exerciseId = exerciseId,
+                        navController = navController
+                    )
+                }
+
             }
-
-            // Pantalla de Favoritos
-            composable(BottomNavItem.Favorites.route) {
-                FavoritesScreen(navController)
-            }
-
-            // Pantalla de Entrenadores con su propia navegación interna
-            composable(BottomNavItem.Trainers.route) {
-                TrainersNavHost() // Nuevo NavHost anidado para entrenadores
-            }
-
-            // Pantalla de Información
-            composable(BottomNavItem.Info.route) {
-                var selectedDate by remember { mutableStateOf(LocalDate.now()) }
-
-                CalendarView(
-                    selectedDate = selectedDate,
-                    onDateSelected = { newDate -> selectedDate = newDate })
-            }
-
-
-            composable(
-                route = "exercise_detail/{exerciseId}",
-                arguments = listOf(navArgument("exerciseId") {
-                    type = NavType.IntType
-                })
-            ) { backStackEntry ->
-                val exerciseId = backStackEntry.arguments?.getInt("exerciseId") ?: -1
-                ExerciseDetailScreen(
-                    exerciseId = exerciseId,
-                    navController = navController
-                )
-            }
-
         }
     }
 }
