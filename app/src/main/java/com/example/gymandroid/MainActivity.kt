@@ -16,8 +16,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.gymandroid.model.ExerciseDBHandler
+import com.example.gymandroid.model.dummyRoutines
 import com.example.gymandroid.ui.theme.GymAndroidTheme
 import com.example.gymandroid.view.MainScreen
+import com.example.gymandroid.view.RoutineListScreen
 
 class MainActivity : ComponentActivity() {
 
@@ -34,6 +36,8 @@ class MainActivity : ComponentActivity() {
 
 
                 MainScreen()
+                //RoutineListScreen(routines = dummyRoutines)
+
             }
         }
     }

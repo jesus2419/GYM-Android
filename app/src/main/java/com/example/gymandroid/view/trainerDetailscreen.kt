@@ -61,6 +61,7 @@ import com.example.gymandroid.model.Category
 import com.example.gymandroid.model.Exercise
 import com.example.gymandroid.model.SocialLink
 import com.example.gymandroid.model.Trainer
+import com.example.gymandroid.model.dummyRoutines
 import com.example.gymandroid.model.dummyTrainers
 import com.example.gymandroid.viewmodel.HomeViewModel
 
@@ -132,11 +133,19 @@ fun TrainerDetailScreen(trainerId: Int, navController1: NavController, viewModel
             when (selectedTabIndex) {
                 0 -> ProfileTabContent(trainer)
                 1 -> Box(modifier = Modifier.weight(1f)) {
+                    RoutineListScreen(routines = dummyRoutines, navController1)
+                    /*
                     LazyColumn {
+
+
                         items(categoriess) { category ->
                             CategoryItem(category, navController1)
                         }
+
+
                     }
+
+                     */
                 }
             }
         }
