@@ -50,7 +50,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.gymandroid.R
-import com.example.gymandroid.model.dummyCategories
 import com.example.gymandroid.ui.theme.AppTheme
 
 import com.example.gymandroid.viewmodel.HomeViewModel

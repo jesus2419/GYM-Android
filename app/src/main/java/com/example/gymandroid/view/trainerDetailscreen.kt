@@ -41,6 +41,7 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,27 +54,33 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.gymandroid.model.Category
 import com.example.gymandroid.model.Exercise
 import com.example.gymandroid.model.SocialLink
 import com.example.gymandroid.model.Trainer
-import com.example.gymandroid.model.dummyCategories
 import com.example.gymandroid.model.dummyTrainers
+import com.example.gymandroid.viewmodel.HomeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TrainerDetailScreen(trainerId: Int) {
+fun TrainerDetailScreen(trainerId: Int, navController1: NavController, viewModel: HomeViewModel = viewModel()) {
     val trainer = dummyTrainers.first { it.id == trainerId }
     val tabTitles = listOf("Perfil", "Rutinas")
     var selectedTabIndex by remember { mutableStateOf(0) }
+
+    val categoriess by viewModel.categories.collectAsState()
+    val favorites by viewModel.favoriteExercises.collectAsState()
+    val likedExercise by viewModel.likedExercise.collectAsState()
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("${trainer.name} ${trainer.lastName}") },
                 navigationIcon = {
-                    IconButton(onClick = { /* Handle back navigation */ }) {
+                    IconButton(onClick = { navController1.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 }
@@ -126,8 +133,8 @@ fun TrainerDetailScreen(trainerId: Int) {
                 0 -> ProfileTabContent(trainer)
                 1 -> Box(modifier = Modifier.weight(1f)) {
                     LazyColumn {
-                        items(dummyCategories) { category ->
-                            CategoryItem(category)
+                        items(categoriess) { category ->
+                            CategoryItem(category, navController1)
                         }
                     }
                 }
@@ -204,21 +211,10 @@ fun SocialLinkItem(link: SocialLink) {
     }
 }
 
-@Composable
-fun RoutinesTabContent() {
-    Column(
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxWidth()
-    ) {
-        dummyCategories.forEach { category ->
-            CategoryItem(category)
-        }
-    }
-}
 
 @Composable
-fun CategoryItem(category: Category) {
+fun CategoryItem(category: Category, navController1: NavController) {
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -235,10 +231,15 @@ fun CategoryItem(category: Category) {
 
             Column {
                 category.exercises.forEach { exercise ->
-                    ExerciseItem(exercise)
+
+
+
+                    ExerciseItem(exercise, navController1)
                     if (exercise != category.exercises.last()) {
                         Divider()
                     }
+
+
                 }
             }
         }
@@ -246,11 +247,12 @@ fun CategoryItem(category: Category) {
 }
 
 @Composable
-fun ExerciseItem(exercise: Exercise) {
+fun ExerciseItem(exercise: Exercise, navController1: NavController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(12.dp),
+            .padding(12.dp)
+            .clickable{ navController1.navigate("exercise_detail/${exercise.id}")},
         verticalAlignment = Alignment.CenterVertically
     ) {
         AsyncImage(

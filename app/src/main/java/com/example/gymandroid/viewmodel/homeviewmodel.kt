@@ -11,7 +11,6 @@ import com.example.gymandroid.model.Category
 import com.example.gymandroid.model.Exercise
 import com.example.gymandroid.model.ExerciseDBHandler
 import com.example.gymandroid.model.ExerciseRepository
-import com.example.gymandroid.model.dummyCategories
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

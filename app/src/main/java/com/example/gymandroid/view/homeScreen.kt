@@ -2,7 +2,6 @@ package com.example.gymandroid.view
 
 import androidx.compose.ui.graphics.Color
 import com.example.gymandroid.model.Exercise
-import com.example.gymandroid.model.dummyCategories
 import com.example.gymandroid.ui.theme.AppTheme
 
 

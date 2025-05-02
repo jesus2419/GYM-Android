@@ -136,7 +136,7 @@ val dummyCategories = listOf(
  */
 
 
-
+/*
 val dummyCategories = listOf(
     Category(
         name = "Pecho",
@@ -176,6 +176,8 @@ val dummyCategories = listOf(
 )
 
 
+
+ */
 
 
 

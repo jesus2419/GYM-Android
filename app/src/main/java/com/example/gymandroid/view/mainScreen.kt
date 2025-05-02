@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -113,8 +114,24 @@ fun MainScreen() {
                 }
 
                 // Pantalla de Entrenadores con su propia navegación interna
+                /*
                 composable(BottomNavItem.Trainers.route) {
-                    TrainersNavHost() // Nuevo NavHost anidado para entrenadores
+                    TrainersNavHost(navController) // Nuevo NavHost anidado para entrenadores
+                }
+
+                */
+
+                composable(BottomNavItem.Trainers.route) {
+                    TrainersScreen(
+                        onTrainerClick = { trainerId ->
+                            navController.navigate("trainerDetails/$trainerId")
+                        }
+                    )
+                }
+
+                composable("trainerDetails/{trainerId}") { backStackEntry ->
+                    val trainerId = backStackEntry.arguments?.getString("trainerId")?.toIntOrNull() ?: 0
+                    TrainerDetailScreen(trainerId = trainerId, navController)
                 }
 
                 // Pantalla de Información
@@ -152,7 +169,7 @@ fun PlaceholderScreen(x0: String) {
 
 // Nuevo NavHost específico para la sección de entrenadores
 @Composable
-fun TrainersNavHost() {
+fun TrainersNavHost(navController1: NavController) {
     val navController = rememberNavController()
 
     NavHost(
@@ -169,7 +186,7 @@ fun TrainersNavHost() {
 
         composable("trainerDetails/{trainerId}") { backStackEntry ->
             val trainerId = backStackEntry.arguments?.getString("trainerId")?.toIntOrNull() ?: 0
-            TrainerDetailScreen(trainerId = trainerId)
+            TrainerDetailScreen(trainerId = trainerId, navController1)
         }
     }
 }
