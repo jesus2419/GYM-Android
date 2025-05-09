@@ -121,6 +121,12 @@ class ExerciseDBHandler(context: Context) : SQLiteOpenHelper(context, DATABASE_N
         onCreate(db)
     }
 
+    override fun onConfigure(db: SQLiteDatabase) {
+        super.onConfigure(db)
+        db.setForeignKeyConstraintsEnabled(true)
+    }
+
+
     fun checkAndCreateTables() {
         val db = writableDatabase
         try {
@@ -396,6 +402,30 @@ class ExerciseDBHandler(context: Context) : SQLiteOpenHelper(context, DATABASE_N
             db.endTransaction()
         }
     }
+
+    fun deleteRoutineById(routineId: Int): Boolean {
+        val db = writableDatabase
+        return try {
+            db.beginTransaction()
+
+            // Al tener ON DELETE CASCADE, basta con eliminar la rutina principal
+            val rowsDeleted = db.delete(
+                TABLE_ROUTINES,
+                "$COL_ID = ?",
+                arrayOf(routineId.toString())
+            )
+
+            db.setTransactionSuccessful()
+            rowsDeleted > 0
+        } catch (e: Exception) {
+            Log.e("DB_ERROR", "Error al eliminar rutina $routineId", e)
+            false
+        } finally {
+            db.endTransaction()
+            db.close()
+        }
+    }
+
 
     // Obtener todas las rutinas guardadas
     @SuppressLint("Range")
