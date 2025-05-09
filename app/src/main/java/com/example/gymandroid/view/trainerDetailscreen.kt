@@ -3,10 +3,12 @@ package com.example.gymandroid.view
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -17,14 +19,17 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Facebook
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -45,7 +50,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.gymandroid.model.Category
@@ -54,19 +58,39 @@ import com.example.gymandroid.model.SocialLink
 import com.example.gymandroid.model.Trainer
 import com.example.gymandroid.model.dummyRoutines
 import com.example.gymandroid.model.dummyTrainers
-import com.example.gymandroid.viewmodel.HomeViewModel
+import com.example.gymandroid.viewmodel.TrainerViewModel
+
+// Para mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+
+// Para StateFlow
+import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TrainerDetailScreen(trainerId: Int, navController1: NavController, viewModel: HomeViewModel = viewModel()) {
+fun TrainerDetailScreen(trainerId: Int, navController1: NavController) {
     val trainer = dummyTrainers.first { it.id == trainerId }
     val tabTitles = listOf("Perfil", "Rutinas")
     var selectedTabIndex by remember { mutableStateOf(0) }
 
-    val categoriess by viewModel.categories.collectAsState()
-    val favorites by viewModel.favoriteExercises.collectAsState()
-    val likedExercise by viewModel.likedExercise.collectAsState()
+    val viewModel: TrainerViewModel = viewModel()
 
+
+
+
+    // Load routines when the screen is first displayed
+    LaunchedEffect(trainerId) {
+        viewModel.loadTrainerRoutines(trainerId)
+    }
+
+    // Para mutableStateOf
+    val trainerRoutines by viewModel.trainerRoutines
+    val isLoading by viewModel.isLoading
 
 
     Scaffold(
@@ -117,20 +141,19 @@ fun TrainerDetailScreen(trainerId: Int, navController1: NavController, viewModel
             when (selectedTabIndex) {
                 0 -> ProfileTabContent(trainer)
                 1 -> Box(modifier = Modifier.weight(1f)) {
-                    RoutineListScreen(routines = dummyRoutines, navController1)
-                    /*
-                    LazyColumn {
-
-
-                        items(categoriess) { category ->
-                            CategoryItem(category, navController1)
-                        }
-
-
+                    when {
+                        isLoading -> LoadingView()
+                        trainerRoutines.isEmpty() -> EmptyView(message = "Este entrenador no tiene rutinas")
+                        else -> RoutineListScreen(routines = trainerRoutines, navController1)
                     }
-
-                     */
                 }
+                /*
+                1 -> Box(modifier = Modifier.weight(1f)) {
+                    RoutineListScreen(routines = dummyRoutines, navController1)
+
+                }
+
+                 */
             }
         }
     }
@@ -272,6 +295,46 @@ fun ExerciseItem(exercise: Exercise, navController1: NavController) {
         Text(
             text = exercise.repsOrTime,
             fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+@Composable
+fun LoadingView(
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CircularProgressIndicator()
+        Spacer(modifier = Modifier.height(16.dp))
+        Text("Cargando rutinas...")
+    }
+}
+
+@Composable
+fun EmptyView(
+    message: String,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
+            imageVector = Icons.Default.Info,
+            contentDescription = "Vacío",
+            modifier = Modifier.size(48.dp),
+            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
         )
     }
 }
