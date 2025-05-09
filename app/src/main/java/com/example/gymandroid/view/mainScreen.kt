@@ -1,6 +1,12 @@
 package com.example.gymandroid.view
 
+import FavoritesScreen
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.ui.unit.dp
 
 
@@ -16,6 +22,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -27,6 +34,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.gymandroid.ui.theme.AppTheme
+import com.example.gymandroid.viewmodel.HomeViewModel
 import com.example.gymandroid.viewmodel.mainViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -148,6 +156,40 @@ fun MainScreen() {
                         exerciseId = exerciseId,
                         navController = navController
                     )
+                }
+
+                composable(
+                    route = "routine_detail/{routineId}",
+                    arguments = listOf(navArgument("routineId") { type = NavType.IntType })
+                ) { backStackEntry ->
+                    val routineId = backStackEntry.arguments?.getInt("routineId") ?: 0
+                    val viewModel: HomeViewModel = viewModel()
+
+                    // Cargar la rutina cuando se entra a la pantalla
+                    LaunchedEffect(routineId) {
+                        viewModel.getRoutineById(routineId)
+                    }
+
+                    // Observar cambios en la rutina seleccionada
+                    val routine by viewModel.selectedRoutine.collectAsState()
+
+                    if (routine != null) {
+                        RoutineScreen(
+                            navController = navController,
+                            routine = routine!!
+                        )
+                    } else {
+                        // Muestra un mensaje de carga o error
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            CircularProgressIndicator()
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text("Cargando rutina...")
+                        }
+                    }
                 }
 
             }

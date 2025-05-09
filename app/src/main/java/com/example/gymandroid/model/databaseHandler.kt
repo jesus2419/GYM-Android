@@ -6,10 +6,11 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
+import com.example.gymandroid.model.ExerciseRepository.getExerciseById
 
 // Constantes para la base de datos
 private const val DATABASE_NAME = "gym_db"
-private const val DATABASE_VERSION = 1
+private const val DATABASE_VERSION = 2
 private const val TABLE_FAVORITES = "favorites"
 
 // Columnas de la tabla favorites
@@ -20,25 +21,123 @@ private const val COL_REPS_OR_TIME = "reps_or_time"
 private const val COL_IMAGE_URL = "image_url"
 private const val COL_TIMESTAMP = "timestamp"
 
+private const val TABLE_ROUTINES = "routines"
+private const val TABLE_ROUTINE_DAYS = "routine_days"
+private const val TABLE_ROUTINE_EXERCISES = "routine_exercises"
+
+// Columnas para rutinas
+private const val COL_TRAINER_ID = "trainer_id"
+private const val COL_OBJECTIVE = "objective"
+private const val COL_LEVEL = "level"
+private const val COL_DURATION_WEEKS = "duration_weeks"
+private const val COL_FREQUENCY_PER_WEEK = "frequency_per_week"
+private const val COL_DESCRIPTION = "description"
+private const val COL_ROUTINE_ID = "routine_id"
+private const val COL_DAY_OF_WEEK = "day_of_week"
+private const val COL_DAY_ID = "day_id"
+private const val COL_EXERCISE_ID = "exercise_id"
+private const val COL_SETS = "sets"
+private const val COL_REPS = "reps"
+private const val COL_REST_SECONDS = "rest_seconds"
+private const val COL_NAMEROUTINE = "name_routine"
+private const val COL_NAMEROUTINEDAY = "name_routineday"
+private const val COL_ORDERROUTINEDAY = "order_routineday"
+private const val COL_ORDERROUTINEXCERSICE = "order_excersiceroutine"
+
+
 class ExerciseDBHandler(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
+    init {
+        checkAndCreateTables()
+    }
+
     override fun onCreate(db: SQLiteDatabase) {
-        val createTable = """
-            CREATE TABLE $TABLE_FAVORITES (
-                $COL_ID INTEGER PRIMARY KEY,
-                $COL_TITLE TEXT NOT NULL,
-                $COL_MUSCLE TEXT NOT NULL,
-                $COL_REPS_OR_TIME TEXT NOT NULL,
-                $COL_IMAGE_URL TEXT NOT NULL,
-                $COL_TIMESTAMP DATETIME DEFAULT CURRENT_TIMESTAMP
-            )
-        """.trimIndent()
-        db.execSQL(createTable)
+        // Tabla de favoritos (existente)
+        val createFavoritesTable = """
+        CREATE TABLE $TABLE_FAVORITES (
+            $COL_ID INTEGER PRIMARY KEY,
+            $COL_TITLE TEXT NOT NULL,
+            $COL_MUSCLE TEXT NOT NULL,
+            $COL_REPS_OR_TIME TEXT NOT NULL,
+            $COL_IMAGE_URL TEXT NOT NULL,
+            $COL_TIMESTAMP DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    """.trimIndent()
+
+        // Tabla de rutinas (nueva)
+        val createRoutinesTable = """
+        CREATE TABLE $TABLE_ROUTINES (
+            $COL_ID INTEGER PRIMARY KEY,
+            $COL_TRAINER_ID INTEGER,
+            $COL_NAMEROUTINE TEXT NOT NULL,
+            $COL_OBJECTIVE TEXT NOT NULL,
+            $COL_LEVEL TEXT NOT NULL,
+            $COL_DURATION_WEEKS INTEGER,
+            $COL_FREQUENCY_PER_WEEK INTEGER,
+            $COL_DESCRIPTION TEXT
+        )
+    """.trimIndent()
+
+        // Tabla de días de rutina (nueva)
+        val createDaysTable = """
+        CREATE TABLE $TABLE_ROUTINE_DAYS (
+            $COL_ID INTEGER PRIMARY KEY,
+            $COL_ROUTINE_ID INTEGER NOT NULL,
+            $COL_DAY_OF_WEEK INTEGER,
+            $COL_NAMEROUTINEDAY TEXT NOT NULL,
+            $COL_ORDERROUTINEDAY INTEGER NOT NULL,
+            FOREIGN KEY($COL_ROUTINE_ID) REFERENCES $TABLE_ROUTINES($COL_ID) ON DELETE CASCADE
+        )
+    """.trimIndent()
+
+        // Tabla de ejercicios de rutina (nueva)
+        val createExercisesTable = """
+        CREATE TABLE $TABLE_ROUTINE_EXERCISES (
+            $COL_ID INTEGER PRIMARY KEY,
+            $COL_DAY_ID INTEGER NOT NULL,
+            $COL_EXERCISE_ID INTEGER NOT NULL,
+            $COL_SETS INTEGER NOT NULL,
+            $COL_REPS INTEGER NOT NULL,
+            $COL_REST_SECONDS INTEGER NOT NULL,
+            $COL_ORDERROUTINEXCERSICE INTEGER NOT NULL,
+            FOREIGN KEY($COL_DAY_ID) REFERENCES $TABLE_ROUTINE_DAYS($COL_ID) ON DELETE CASCADE
+        )
+    """.trimIndent()
+
+        db.execSQL(createFavoritesTable)
+        db.execSQL(createRoutinesTable)
+        db.execSQL(createDaysTable)
+        db.execSQL(createExercisesTable)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        // Elimina todas las tablas existentes
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FAVORITES")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_ROUTINES")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_ROUTINE_DAYS")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_ROUTINE_EXERCISES")
+
+        // Vuelve a crear las tablas
         onCreate(db)
+    }
+
+    fun checkAndCreateTables() {
+        val db = writableDatabase
+        try {
+            // Verifica si la tabla routines existe
+            val cursor = db.rawQuery("SELECT name FROM sqlite_master WHERE type='table' AND name='$TABLE_ROUTINES'", null)
+            val exists = cursor.count > 0
+            cursor.close()
+
+            if (!exists) {
+                // Crea las tablas que faltan
+                onCreate(db)
+            }
+        } catch (e: Exception) {
+            Log.e("DB_ERROR", "Error checking tables", e)
+        } finally {
+            db.close()
+        }
     }
 
 
@@ -231,5 +330,166 @@ class ExerciseDBHandler(context: Context) : SQLiteOpenHelper(context, DATABASE_N
             }
         }
     }
+
+
+
+    // Resultado de operación para rutinas
+    sealed class RoutineSaveResult {
+        object Success : RoutineSaveResult()
+        data class Error(val exception: Exception) : RoutineSaveResult()
+    }
+
+    // Guardar rutina completa
+    fun saveFullRoutine(routine: FullRoutine): RoutineSaveResult {
+        val db = writableDatabase
+        return try {
+            db.beginTransaction()
+
+            // 1. Guardar la rutina principal
+            val routineValues = ContentValues().apply {
+                put(COL_ID, routine.routine.id)
+                put(COL_TRAINER_ID, routine.routine.id_trainer)
+                put(COL_NAMEROUTINE, routine.routine.name)
+                put(COL_OBJECTIVE, routine.routine.objective)
+                put(COL_LEVEL, routine.routine.level)
+                put(COL_DURATION_WEEKS, routine.routine.durationWeeks)
+                put(COL_FREQUENCY_PER_WEEK, routine.routine.frequencyPerWeek)
+                put(COL_DESCRIPTION, routine.routine.description)
+            }
+
+            db.insertWithOnConflict(TABLE_ROUTINES, null, routineValues, SQLiteDatabase.CONFLICT_REPLACE)
+
+            // 2. Guardar los días de la rutina
+            routine.days.forEach { day ->
+                val dayValues = ContentValues().apply {
+                    put(COL_ID, day.routineDay.id)
+                    put(COL_ROUTINE_ID, routine.routine.id)
+                    put(COL_DAY_OF_WEEK, day.routineDay.dayOfWeek)
+                    put(COL_NAMEROUTINEDAY, day.routineDay.name)
+                    put(COL_ORDERROUTINEDAY, day.routineDay.order)
+                }
+
+                db.insertWithOnConflict(TABLE_ROUTINE_DAYS, null, dayValues, SQLiteDatabase.CONFLICT_REPLACE)
+
+                // 3. Guardar los ejercicios de cada día
+                day.exercises.forEach { exercise ->
+                    val exerciseValues = ContentValues().apply {
+                        put(COL_ID, exercise.routineDayExercise.id)
+                        put(COL_DAY_ID, day.routineDay.id)
+                        put(COL_EXERCISE_ID, exercise.routineDayExercise.exerciseId)
+                        put(COL_SETS, exercise.routineDayExercise.sets)
+                        put(COL_REPS, exercise.routineDayExercise.reps)
+                        put(COL_REST_SECONDS, exercise.routineDayExercise.restSeconds)
+                        put(COL_ORDERROUTINEXCERSICE, exercise.routineDayExercise.order)
+                    }
+
+                    db.insertWithOnConflict(TABLE_ROUTINE_EXERCISES, null, exerciseValues, SQLiteDatabase.CONFLICT_REPLACE)
+                }
+            }
+
+            db.setTransactionSuccessful()
+            RoutineSaveResult.Success
+        } catch (e: Exception) {
+            Log.e("DB_ERROR", "Error saving routine", e)
+            RoutineSaveResult.Error(e)
+        } finally {
+            db.endTransaction()
+        }
+    }
+
+    // Obtener todas las rutinas guardadas
+    @SuppressLint("Range")
+    fun getAllSavedRoutines(): List<FullRoutine> {
+        val routines = mutableListOf<FullRoutine>()
+        val db = readableDatabase
+
+        try {
+            val routinesCursor = db.rawQuery("SELECT * FROM $TABLE_ROUTINES", null)
+
+            if (routinesCursor.moveToFirst()) {
+                do {
+                    val routineId = routinesCursor.getInt(routinesCursor.getColumnIndex(COL_ID))
+
+                    val routine = Routine(
+                        id = routineId,
+                        id_trainer = routinesCursor.getInt(routinesCursor.getColumnIndex(COL_TRAINER_ID)),
+                        name = routinesCursor.getString(routinesCursor.getColumnIndex(COL_NAMEROUTINE)),
+                        objective = routinesCursor.getString(routinesCursor.getColumnIndex(COL_OBJECTIVE)),
+                        level = routinesCursor.getString(routinesCursor.getColumnIndex(COL_LEVEL)),
+                        durationWeeks = routinesCursor.getInt(routinesCursor.getColumnIndex(COL_DURATION_WEEKS)),
+                        frequencyPerWeek = routinesCursor.getInt(routinesCursor.getColumnIndex(COL_FREQUENCY_PER_WEEK)),
+                        description = routinesCursor.getString(routinesCursor.getColumnIndex(COL_DESCRIPTION))
+                    )
+
+                    val days = mutableListOf<FullRoutineDay>()
+                    val daysCursor = db.rawQuery(
+                        "SELECT * FROM $TABLE_ROUTINE_DAYS WHERE $COL_ROUTINE_ID = ? ORDER BY $COL_ORDERROUTINEDAY",
+                        arrayOf(routineId.toString())
+                    )
+
+                    if (daysCursor.moveToFirst()) {
+                        do {
+                            val dayId = daysCursor.getInt(daysCursor.getColumnIndex(COL_ID))
+
+                            val routineDay = RoutineDay(
+                                id = dayId,
+                                routineId = routineId,
+                                dayOfWeek = daysCursor.getInt(daysCursor.getColumnIndex(COL_DAY_OF_WEEK)),
+                                name = daysCursor.getString(daysCursor.getColumnIndex(COL_NAMEROUTINEDAY)),
+                                order = daysCursor.getInt(daysCursor.getColumnIndex(COL_ORDERROUTINEDAY))
+                            )
+
+                            val exercises = mutableListOf<RoutineDayExerciseWithDetails>()
+                            val exercisesCursor = db.rawQuery(
+                                "SELECT * FROM $TABLE_ROUTINE_EXERCISES WHERE $COL_DAY_ID = ? ORDER BY $COL_ORDERROUTINEXCERSICE",
+                                arrayOf(dayId.toString())
+                            )
+
+                            if (exercisesCursor.moveToFirst()) {
+                                do {
+                                    val routineDayExercise = RoutineDayExercise(
+                                        id = exercisesCursor.getInt(exercisesCursor.getColumnIndex(COL_ID)),
+                                        routineDayId = dayId,
+                                        exerciseId = exercisesCursor.getInt(exercisesCursor.getColumnIndex(COL_EXERCISE_ID)),
+                                        sets = exercisesCursor.getInt(exercisesCursor.getColumnIndex(COL_SETS)),
+                                        reps = exercisesCursor.getInt(exercisesCursor.getColumnIndex(COL_REPS)),
+                                        restSeconds = exercisesCursor.getInt(exercisesCursor.getColumnIndex(COL_REST_SECONDS)),
+                                        order = exercisesCursor.getInt(exercisesCursor.getColumnIndex(COL_ORDERROUTINEXCERSICE))
+                                    )
+
+                                    // Obtener el ejercicio completo de la tabla de ejercicios/favoritos
+                                    val exerciseDetails = getExerciseById(routineDayExercise.exerciseId)
+                                    val exercise = exerciseDetails ?: Exercise(
+                                        id = routineDayExercise.exerciseId,
+                                        title = "Ejercicio ${routineDayExercise.exerciseId}",
+                                        muscle = "Desconocido",
+                                        repsOrTime = "${routineDayExercise.sets}x${routineDayExercise.reps}",
+                                        imageUrl = "",
+                                        description = ""
+                                    )
+
+                                    exercises.add(RoutineDayExerciseWithDetails(routineDayExercise, exercise))
+                                } while (exercisesCursor.moveToNext())
+                            }
+                            exercisesCursor.close()
+
+                            days.add(FullRoutineDay(routineDay, exercises))
+                        } while (daysCursor.moveToNext())
+                    }
+                    daysCursor.close()
+
+                    routines.add(FullRoutine(routine, days))
+                } while (routinesCursor.moveToNext())
+            }
+            routinesCursor.close()
+        } catch (e: Exception) {
+            Log.e("DB_ERROR", "Error getting routines", e)
+        } finally {
+            db.close()
+        }
+
+        return routines
+    }
+
 }
 

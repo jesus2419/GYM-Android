@@ -11,6 +11,7 @@ import com.example.gymandroid.model.Category
 import com.example.gymandroid.model.Exercise
 import com.example.gymandroid.model.ExerciseDBHandler
 import com.example.gymandroid.model.ExerciseRepository
+import com.example.gymandroid.model.FullRoutine
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,6 +25,15 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _categories = MutableStateFlow<List<Category>>(emptyList())
     val categories: StateFlow<List<Category>> = _categories.asStateFlow()
+
+    // Estado para ejercicio seleccionado
+    private val _selectedExercise = MutableStateFlow<Exercise?>(null)
+    val selectedExercise: StateFlow<Exercise?> = _selectedExercise.asStateFlow()
+
+    // Estado para la rutina seleccionada
+    private val _selectedRoutine = MutableStateFlow<FullRoutine?>(null)
+    val selectedRoutine: StateFlow<FullRoutine?> = _selectedRoutine.asStateFlow()
+
 
     private val _favoriteExercises = MutableStateFlow<Set<Int>>(emptySet())
     val favoriteExercises: StateFlow<Set<Int>> = _favoriteExercises.asStateFlow()
@@ -41,6 +51,37 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             //_categories.value = ExerciseRepository.getCategories2()
         }
     }
+
+    fun loadExerciseById(id: Int) {
+        viewModelScope.launch {
+            try {
+                _selectedExercise.value = ExerciseRepository.getExerciseById(id)
+            } catch (e: Exception) {
+                // Manejo de errores
+                _selectedExercise.value = null
+            }
+        }
+    }
+
+    // Función para obtener rutina por ID
+    fun getRoutineById(routineId: Int) {
+        viewModelScope.launch {
+            try {
+                // Obtener todas las rutinas y filtrar por ID
+                val allRoutines = dbHandler.getAllSavedRoutines()
+                _selectedRoutine.value = allRoutines.find { it.routine.id == routineId }
+
+                if (_selectedRoutine.value == null) {
+                    Log.w("ROUTINE", "No se encontró rutina con ID: $routineId")
+                }
+            } catch (e: Exception) {
+                Log.e("ROUTINE", "Error al obtener rutina", e)
+                _selectedRoutine.value = null
+            }
+        }
+    }
+
+
 
 
     // Función para cargar favoritos al iniciar

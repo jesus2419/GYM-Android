@@ -7,19 +7,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.gymandroid.model.ExerciseDBHandler
-import com.example.gymandroid.model.dummyRoutines
-import com.example.gymandroid.ui.theme.GymAndroidTheme
 import com.example.gymandroid.view.MainScreen
-import com.example.gymandroid.view.RoutineListScreen
 
 class MainActivity : ComponentActivity() {
 

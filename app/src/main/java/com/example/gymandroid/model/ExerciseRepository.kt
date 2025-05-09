@@ -2,6 +2,9 @@ package com.example.gymandroid.model
 
 
 object ExerciseRepository {
+    fun getExerciseById(id: Int): Exercise? {
+        return getCategories().flatMap { it.exercises }.firstOrNull { it.id == id }
+    }
     fun getCategories(): List<Category> = listOf(
         Category(
             name = "Pecho",
