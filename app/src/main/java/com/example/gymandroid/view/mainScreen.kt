@@ -31,8 +31,12 @@ import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.gymandroid.model.TopBarState
+import com.example.gymandroid.model.Trainer
+import com.example.gymandroid.model.dummyTrainers
 import com.example.gymandroid.ui.theme.AppTheme
 import com.example.gymandroid.viewmodel.HomeViewModel
 import com.example.gymandroid.viewmodel.mainViewModel
@@ -48,6 +52,27 @@ fun MainScreen() {
     val scope = rememberCoroutineScope()
 
 
+    // Obtener la ruta actual
+    val currentRoute by navController.currentBackStackEntryAsState()
+    val currentRouteName = currentRoute?.destination?.route
+
+    // Estado para el entrenador seleccionado
+    var currentTrainer by remember { mutableStateOf<Trainer?>(null) }
+
+    // Determinar el estado del TopBar basado en la ruta
+    val topBarState = remember(currentRouteName) {
+        when {
+            currentRouteName == BottomNavItem.Home.route -> TopBarState.Home
+            currentRouteName == BottomNavItem.Favorites.route -> TopBarState.Favorites
+            currentRouteName == BottomNavItem.Trainers.route -> TopBarState.Trainers
+            currentRouteName == BottomNavItem.Info.route -> TopBarState.Info
+            currentRouteName?.startsWith("exercise_detail") == true -> TopBarState.ExerciseDetail
+            currentRouteName?.startsWith("routine_detail") == true -> TopBarState.RoutineDetail
+            currentRouteName?.startsWith("trainerDetails") == true -> TopBarState.TrainerDetail
+
+            else -> TopBarState.Home
+        }
+    }
 
     val screens = listOf(
         BottomNavItem.Home,
@@ -69,21 +94,10 @@ fun MainScreen() {
 
         Scaffold(
             topBar = {
-                CenterAlignedTopAppBar(
-                    title = { Text(text = "si") },
-                    navigationIcon = {
-                        IconButton(
-                            onClick = { scope.launch { viewModel.drawerState.open() } }
-                        ) {
-                            Icon(Icons.Default.Menu, contentDescription = "Abrir menú")
-                        }
-                    },
-
-                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                        containerColor = AppTheme.PrimaryColor,
-                        titleContentColor = Color.White,
-                        navigationIconContentColor = Color.White
-                    )
+                DynamicTopBar(
+                    state = topBarState,
+                    onBackClick = { navController.popBackStack() },
+                    onMenuClick = { scope.launch { viewModel.drawerState.open() } }
                 )
             },
             containerColor = AppTheme.BackgroundColor,
@@ -130,10 +144,15 @@ fun MainScreen() {
                     )
                 }
 
+
+
                 composable("trainerDetails/{trainerId}") { backStackEntry ->
                     val trainerId = backStackEntry.arguments?.getString("trainerId")?.toIntOrNull() ?: 0
                     TrainerDetailScreen(trainerId = trainerId, navController)
                 }
+
+
+
 
                 // Pantalla de Información
                 composable(BottomNavItem.Info.route) {

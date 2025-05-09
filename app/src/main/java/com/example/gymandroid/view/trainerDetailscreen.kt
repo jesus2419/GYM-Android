@@ -31,6 +31,7 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -66,17 +67,10 @@ fun TrainerDetailScreen(trainerId: Int, navController1: NavController, viewModel
     val favorites by viewModel.favoriteExercises.collectAsState()
     val likedExercise by viewModel.likedExercise.collectAsState()
 
+
+
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("${trainer.name} ${trainer.lastName}") },
-                navigationIcon = {
-                    IconButton(onClick = { navController1.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                    }
-                }
-            )
-        }
+        topBar = {} // Dejamos vacío porque lo maneja el DynamicTopBar
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
             // Contenedor para las imágenes (portada + perfil superpuesto)

@@ -36,11 +36,7 @@ import androidx.compose.foundation.lazy.items
 @Composable
 fun TrainersScreen(onTrainerClick: (Int) -> Unit) {
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Entrenadores") },
-            )
-        }
+
     ) { padding ->
         LazyColumn(
             modifier = Modifier

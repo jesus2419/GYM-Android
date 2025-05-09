@@ -92,21 +92,7 @@ fun ExerciseDetailScreen(
     val isFavorite = favoriteExercises.contains(exerciseId)
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(exercise.title) },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Volver",
-                            tint = Color.Gray
-                        )
-                    }
-                }
 
-            )
-        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { viewModel.toggleFavorite(exercise) },

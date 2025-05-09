@@ -58,21 +58,7 @@ fun FavoritesScreen(
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("Mis Guardados") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Atrás")
-                    }
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = AppTheme.PrimaryColor,
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White
-                )
-            )
-        }
+
     ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
             // Pestañas - Versión corregida
