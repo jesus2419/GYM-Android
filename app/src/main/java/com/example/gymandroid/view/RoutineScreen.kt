@@ -4,7 +4,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -14,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
@@ -25,6 +29,8 @@ import com.example.gymandroid.model.RoutineDay
 import com.example.gymandroid.model.RoutineDayExercise
 import com.example.gymandroid.model.RoutineDayExerciseWithDetails
 import com.example.gymandroid.ui.theme.AppTheme
+import com.example.gymandroid.viewmodel.HomeViewModel
+import com.example.gymandroid.viewmodel.routineViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,7 +47,7 @@ fun RoutineScreen(
                 .fillMaxSize()
         ) {
             // Encabezado de la rutina
-            RoutineHeader(routine = routine)
+            RoutineHeader(routine = routine, navController)
 
             // Lista de días con ejercicios
             LazyColumn(
@@ -59,7 +65,10 @@ fun RoutineScreen(
 }
 
 @Composable
-private fun RoutineHeader(routine: FullRoutine) {
+private fun RoutineHeader(routine: FullRoutine, navController: NavController) {
+
+    val viewModel: routineViewModel = viewModel()
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -82,6 +91,7 @@ private fun RoutineHeader(routine: FullRoutine) {
                 style = MaterialTheme.typography.bodyMedium
             )
 
+
             Spacer(modifier = Modifier.height(12.dp))
 
             Row(
@@ -100,6 +110,43 @@ private fun RoutineHeader(routine: FullRoutine) {
                     label = "Frecuencia",
                     value = "${routine.routine.frequencyPerWeek} días/semana"
                 )
+
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 12.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Button(
+                    onClick = { /* Acción ir al perfil */ },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.AccountCircle,
+                        contentDescription = "Entrenador",
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Ver Entrenador")
+                }
+
+                Button(
+                    onClick = { if(viewModel.deleteroutine(routine)){
+                        navController.navigate("favorites")
+
+                    } },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Eliminar rutina",
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Eliminar")
+                }
             }
         }
     }
