@@ -58,6 +58,10 @@ dependencies {
     implementation ("com.google.accompanist:accompanist-pager:0.28.0")
     implementation ("com.google.accompanist:accompanist-pager-indicators:0.28.0")
 
+    implementation ("androidx.media3:media3-exoplayer:1.3.0")
+    implementation ("androidx.media3:media3-ui:1.3.0")
+
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

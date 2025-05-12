@@ -43,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 
@@ -211,6 +212,17 @@ fun ExerciseDetailScreen(
                     color = AppTheme.TextColor,
                     modifier = Modifier.padding(horizontal = 8.dp)
                 )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                VideoPlayer(
+                    context = LocalContext.current,
+                    videoUrl = "https://youtu.be/SWkMYO9V_-k",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(220.dp)
+                )
+
             }
         }
     }
