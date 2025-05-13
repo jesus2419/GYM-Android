@@ -217,7 +217,7 @@ fun ExerciseDetailScreen(
 
                 VideoPlayer(
                     context = LocalContext.current,
-                    videoUrl = "https://youtu.be/SWkMYO9V_-k",
+                    videoUrl = "https://www.w3schools.com/html/mov_bbb.mp4",
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(220.dp)
