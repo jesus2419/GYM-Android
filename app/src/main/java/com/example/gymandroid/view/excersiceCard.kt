@@ -33,13 +33,12 @@ import com.example.gymandroid.model.Exercise
 import com.example.gymandroid.ui.theme.AppTheme
 import com.example.gymandroid.viewmodel.HomeViewModel
 
-
 @Composable
 fun ExerciseCard(
     exercise: Exercise,
     isFavorite: Boolean,
     onFavoriteClick: (Exercise) -> Unit,
-    navController: NavController,  // Añade navController como parámetro
+    navController: NavController,
     isLiked: Boolean = false,
     modifier: Modifier = Modifier
 ) {
@@ -56,14 +55,14 @@ fun ExerciseCard(
             stiffness = Spring.StiffnessLow
         )
     )
+
     Column(
         modifier = modifier
             .width(200.dp)
             .clip(RoundedCornerShape(16.dp))
-            .background(Color.White)
+            .background(MaterialTheme.colorScheme.surface)
             .padding(8.dp)
             .clickable {
-                // Navega a la pantalla de detalles con el ID del ejercicio
                 navController.navigate("exercise_detail/${exercise.id}")
             }
     ) {
@@ -82,19 +81,19 @@ fun ExerciseCard(
         Text(
             text = exercise.title,
             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-            color = AppTheme.TextColor
+            color = MaterialTheme.colorScheme.onSurface
         )
 
         Text(
             text = exercise.muscle,
             style = MaterialTheme.typography.bodySmall,
-            color = AppTheme.TextColor
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
         )
 
         Text(
             text = exercise.repsOrTime,
             style = MaterialTheme.typography.bodySmall,
-            color = AppTheme.TextColor
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
         )
 
         Row(
@@ -102,13 +101,18 @@ fun ExerciseCard(
             modifier = Modifier.fillMaxWidth()
         ) {
             Spacer(modifier = Modifier.weight(1f))
-            IconButton(onClick = { onFavoriteClick(exercise) },
-                modifier = Modifier.scale(scale) // Aplicamos la animación
-                         ) {
+            IconButton(
+                onClick = { onFavoriteClick(exercise) },
+                modifier = Modifier.scale(scale)
+            ) {
                 Icon(
                     imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                     contentDescription = "Favorito",
-                    tint = if (isFavorite || isLiked) AppTheme.LikeColor else AppTheme.TextColor
+                    tint = if (isFavorite || isLiked) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                    }
                 )
             }
         }

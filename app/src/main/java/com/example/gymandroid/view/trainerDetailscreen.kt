@@ -147,13 +147,7 @@ fun TrainerDetailScreen(trainerId: Int, navController1: NavController) {
                         else -> RoutineListScreen(routines = trainerRoutines, navController1)
                     }
                 }
-                /*
-                1 -> Box(modifier = Modifier.weight(1f)) {
-                    RoutineListScreen(routines = dummyRoutines, navController1)
 
-                }
-
-                 */
             }
         }
     }
@@ -169,27 +163,31 @@ fun ProfileTabContent(trainer: Trainer) {
     ) {
         Text(
             text = "${trainer.name} ${trainer.lastName}",
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface,
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = trainer.schedule
+            text = trainer.schedule,
+            color = MaterialTheme.colorScheme.onSurface,
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
             text = trainer.description,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurface,
         )
 
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
             text = "Redes Sociales",
-            modifier = Modifier.align(Alignment.Start)
+            modifier = Modifier.align(Alignment.Start),
+            color = MaterialTheme.colorScheme.onSurface,
         )
 
         Divider(modifier = Modifier.padding(vertical = 8.dp))
@@ -218,49 +216,25 @@ fun SocialLinkItem(link: SocialLink) {
                 "YouTube" -> Icons.Default.PlayArrow
                 else -> Icons.Default.Link
             },
-            contentDescription = null
+            contentDescription = "${link.platform} icon", // Siempre es buena práctica incluir descripción
+            tint = when (link.platform) {
+                "Instagram" -> Color(0xFFE1306C) // Rosa Instagram
+                "Facebook" -> Color(0xFF1877F2)  // Azul Facebook
+                "YouTube" -> Color(0xFFFF0000)   // Rojo YouTube
+                else -> MaterialTheme.colorScheme.primary // Usa el color primario de tu tema para otros casos
+            },
+            modifier = Modifier.size(24.dp) // Tamaño consistente
         )
 
         Spacer(modifier = Modifier.width(16.dp))
 
-        Text(text = link.platform)
+        Text(text = link.platform,
+            color = MaterialTheme.colorScheme.onSurface,)
     }
 }
 
 
-@Composable
-fun CategoryItem(category: Category, navController1: NavController) {
 
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-
-    ) {
-        Column {
-            Text(
-                text = category.name,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
-            )
-
-            Column {
-                category.exercises.forEach { exercise ->
-
-
-
-                    ExerciseItem(exercise, navController1)
-                    if (exercise != category.exercises.last()) {
-                        Divider()
-                    }
-
-
-                }
-            }
-        }
-    }
-}
 
 @Composable
 fun ExerciseItem(exercise: Exercise, navController1: NavController) {

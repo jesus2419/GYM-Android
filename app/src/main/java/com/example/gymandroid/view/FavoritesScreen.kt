@@ -47,15 +47,7 @@ fun FavoritesScreen(
         }
     )
 ) {
-    val favorites by favoritesViewModel.favorites.collectAsState()
-    val isLoadingFavorites by favoritesViewModel.isLoading.collectAsState()
 
-    val routines by routinesViewModel.savedRoutines.collectAsState()
-    val isLoadingRoutines by routinesViewModel.isLoading.collectAsState()
-
-    val tabs = listOf("Ejercicios Favoritos", "Rutinas Guardadas")
-    val pagerState = rememberPagerState()
-    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
 
@@ -67,8 +59,9 @@ fun FavoritesScreen(
             // Pestañas
             TabRow(
                 selectedTabIndex = selectedTabIndex,
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+
             ) {
                 tabs.forEachIndexed { index, title ->
                     Tab(
@@ -215,7 +208,11 @@ private fun RoutineCard(
     Card(
         onClick = onClick,
         modifier = modifier,
-        elevation = CardDefaults.cardElevation(4.dp)
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(

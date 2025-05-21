@@ -28,6 +28,10 @@ fun AppNavigation() {
                             popUpTo("login") { inclusive = true }
                         }
                     }
+                    //testeo
+                    navController.navigate("main") {
+                        popUpTo("login") { inclusive = true }
+                    }
                 },
                 isLoading = false
             )

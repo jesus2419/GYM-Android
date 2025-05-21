@@ -18,7 +18,6 @@ import androidx.compose.ui.graphics.Color
 import com.example.gymandroid.model.TopBarState
 import com.example.gymandroid.model.Trainer
 import com.example.gymandroid.ui.theme.AppTheme
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DynamicTopBar(
@@ -26,35 +25,39 @@ fun DynamicTopBar(
     onBackClick: () -> Unit,
     onMenuClick: () -> Unit
 ) {
-
-        CenterAlignedTopAppBar(
-            title = { Text(text = state.title) },
-            navigationIcon = {
-                if (state.showBackButton) {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Volver",
-                            tint = Color.White
-                        )
-                    }
-                } else {
-                    IconButton(onClick = onMenuClick) {
-                        Icon(
-                            imageVector = Icons.Default.Menu,
-                            contentDescription = "Abrir menú",
-                            tint = Color.White
-                        )
-                    }
-                }
-            },
-            actions = { state.actions() },
-            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                containerColor = AppTheme.PrimaryColor,
-                titleContentColor = Color.White,
-                navigationIconContentColor = Color.White,
-                actionIconContentColor = Color.White
+    CenterAlignedTopAppBar(
+        title = {
+            Text(
+                text = state.title,
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onPrimary
             )
+        },
+        navigationIcon = {
+            if (state.showBackButton) {
+                IconButton(onClick = onBackClick) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Volver",
+                        tint = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
+            } else {
+                IconButton(onClick = onMenuClick) {
+                    Icon(
+                        imageVector = Icons.Default.Menu,
+                        contentDescription = "Abrir menú",
+                        tint = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
+            }
+        },
+        actions = { state.actions() },
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            titleContentColor = MaterialTheme.colorScheme.onPrimary,
+            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+            actionIconContentColor = MaterialTheme.colorScheme.onPrimary
         )
-
+    )
 }

@@ -1,6 +1,8 @@
 package com.example.gymandroid.view
 
 import android.content.Context
+import android.content.res.Configuration
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,6 +22,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.ContentScale
@@ -35,6 +38,7 @@ import com.example.gymandroid.model.Routine
 import com.example.gymandroid.model.RoutineDay
 import com.example.gymandroid.model.RoutineDayExercise
 import com.example.gymandroid.model.RoutineDayExerciseWithDetails
+import com.example.gymandroid.ui.theme.GymTheme
 import kotlinx.coroutines.delay
 
 
@@ -63,7 +67,9 @@ private fun RoutineListContent(
     routines: List<FullRoutine>,
     onRoutineSelected: (FullRoutine) -> Unit
 ) {
-    LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+    LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)
+        .background(MaterialTheme.colorScheme.background)
+    ) {
         items(routines) { routine ->
             RoutineCard(routine = routine, onClick = { onRoutineSelected(routine) })
         }
@@ -77,6 +83,10 @@ private fun RoutineCard(routine: FullRoutine, onClick: () -> Unit) {
             .fillMaxWidth()
             .padding(vertical = 8.dp)
             .clickable(onClick = onClick),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        ),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -114,17 +124,22 @@ fun RoutineDetailScreen(
     val dbHandler = remember { ExerciseDBHandler.getInstance(context) }
     var showSaveSuccess by remember { mutableStateOf(false) }
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+    Column(modifier = Modifier.fillMaxSize().padding(16.dp).background(MaterialTheme.colorScheme.surface)
+    ) {
         // Header de la rutina
         Text(
             text = routine.routine.name,
-            style = MaterialTheme.typography.headlineMedium
-        )
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+
+            )
         Text(
             text = routine.routine.description,
             style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(vertical = 4.dp)
-        )
+            modifier = Modifier.padding(vertical = 4.dp),
+            color = MaterialTheme.colorScheme.onSurface,
+
+            )
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -233,6 +248,7 @@ private fun ExerciseItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(12.dp)
+                .background(MaterialTheme.colorScheme.surface)
                 .clickable {
                     navController.navigate("exercise_detail/${exercise.exercise.id}")
                 },
@@ -269,54 +285,3 @@ private fun ExerciseItem(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun RoutineDetailScreenPreview() {
-    val dummyRoutine = FullRoutine(
-        routine = Routine(
-            id = 1,
-            id_trainer = 1,
-            name = "Hipertrofia 3 días",
-            objective = "Ganar masa muscular",
-            level = "Intermedio",
-            durationWeeks = 6,
-            frequencyPerWeek = 3,
-            description = "Rutina para hipertrofia dividida en tren superior e inferior"
-        ),
-        days = listOf(
-            FullRoutineDay(
-                routineDay = RoutineDay(
-                    id = 1,
-                    routineId = 1,
-                    dayOfWeek = 1,
-                    name = "Pecho y Tríceps",
-                    order = 1
-                ),
-                exercises = listOf(
-                    RoutineDayExerciseWithDetails(
-                        routineDayExercise = RoutineDayExercise(
-                            id = 1,
-                            routineDayId = 1,
-                            exerciseId = 1,
-                            sets = 4,
-                            reps = 12,
-                            restSeconds = 60,
-                            order = 1
-                        ),
-                        exercise = Exercise(
-                            id = 1,
-                            title = "Press de banca",
-                            muscle = "Pecho",
-                            repsOrTime = "4x12",
-                            imageUrl = "https://example.com/press_banca.jpg",
-                            description = "Ejercicio básico para pecho"
-                        )
-                    )
-                )
-            )
-        )
-    )
-
-    val navController = rememberNavController()
-
-}

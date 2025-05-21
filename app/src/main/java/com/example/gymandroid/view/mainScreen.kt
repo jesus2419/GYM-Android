@@ -103,18 +103,30 @@ fun MainScreen() {
             containerColor = AppTheme.BackgroundColor,
 
             bottomBar = {
-                NavigationBar {
+                val selectedColor = MaterialTheme.colorScheme.onPrimary
+                val unselectedColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f)
+
+                NavigationBar(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = selectedColor
+                ) {
                     screens.forEachIndexed { index, screen ->
                         NavigationBarItem(
-                            icon = { Icon(screen.icon, contentDescription = screen.title) },
-                            label = { Text(screen.title) },
+                            icon = { Icon(screen.icon, screen.title, tint = if (selectedItem == index) selectedColor else unselectedColor) },
+                            label = { Text(screen.title, color = if (selectedItem == index) selectedColor else unselectedColor) },
                             selected = selectedItem == index,
                             onClick = {
                                 selectedItem = index
-                                // Navegación a las pantallas principales
                                 navController.popBackStack()
                                 navController.navigate(screen.route)
-                            }
+                            },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = selectedColor,
+                                selectedTextColor = selectedColor,
+                                unselectedIconColor = unselectedColor,
+                                unselectedTextColor = unselectedColor,
+                                indicatorColor = MaterialTheme.colorScheme.secondary
+                            )
                         )
                     }
                 }

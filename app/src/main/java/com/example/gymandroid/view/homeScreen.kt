@@ -43,18 +43,10 @@ fun HomeScreen(
     val favorites by viewModel.favoriteExercises.collectAsState()
     val likedExercise by viewModel.likedExercise.collectAsState()
 
-
-
-
-
-
-
-
-
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(AppTheme.BackgroundColor)
+            .background(MaterialTheme.colorScheme.background)
             .padding(8.dp)
     ) {
         items(categories.size) { categoryIndex ->
@@ -63,7 +55,8 @@ fun HomeScreen(
             Text(
                 text = category.name,
                 modifier = Modifier.padding(vertical = 8.dp),
-                color = Color.White,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontWeight = FontWeight.Bold
             )
 
@@ -78,14 +71,13 @@ fun HomeScreen(
                         isFavorite = favorites.contains(exercise.id),
                         onFavoriteClick = { viewModel.toggleFavorite(it) },
                         isLiked = likedExercise?.id == exercise.id,
-                        navController = navController,  // Pasa el navController aquí
-
+                        navController = navController,
+                        modifier = Modifier
                     )
                 }
             }
         }
     }
 }
-
 
 
