@@ -72,3 +72,29 @@ object AppTheme {
     // Logo o íconos podrías tener como URLs o resources luego
     const val AppLogoUrl = "https://via.placeholder.com/150"
 }
+
+
+
+val GymColorScheme = lightColorScheme(
+    primary = Color(0xFFB6B09F),  // Color principal (gris oscuro)
+    secondary = Color(0xFFEAE4D5),  // Color secundario (beige claro)
+    tertiary = Color(0xFFF2F2F2),   // Color de fondo (gris muy claro)
+    background = Color(0xFFF2F2F2),
+    surface = Color(0xFFFFFFFF),    // Superficies blancas
+    onPrimary = Color(0xFF000000),  // Texto sobre primary (negro)
+    onSecondary = Color(0xFF000000), // Texto sobre secondary (negro)
+    onBackground = Color(0xFF000000), // Texto sobre fondo (negro)
+    onSurface = Color(0xFF000000),   // Texto sobre superficie (negro)
+    error = Color(0xFFB00020)       // Color de error estándar
+)
+
+@Composable
+fun GymTheme(
+    content: @Composable () -> Unit
+) {
+    MaterialTheme(
+        colorScheme = GymColorScheme,
+        typography = Typography,
+        content = content
+    )
+}
